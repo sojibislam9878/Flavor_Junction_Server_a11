@@ -68,6 +68,30 @@ async function run() {
         res.send(result)
       })
 
+      app.put("/updateCard/:id", async (req, res) => {
+        const id = req.params.id;
+        const filter = { _id: new ObjectId(id) };
+        const options = { upsert: true };
+        const updatedCard = req.body;
+        const updateCard = {
+          $set: {
+            quantity: updatedCard.quantity,
+            price: updatedCard.price,
+            photo_url: updatedCard.photo_url,
+            food_origin: updatedCard.food_origin,
+            food_name: updatedCard.food_name,
+            food_category: updatedCard.food_category,
+            description: updatedCard.description,
+          },
+        };
+        const result = await foodsCollection.updateOne(
+          filter,
+          updateCard,
+          options
+        );
+        res.send(result);
+      });
+
 
         // gallerycolleciton functions
 
