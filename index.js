@@ -32,8 +32,19 @@ async function run() {
       app.get("/allFoods",async (req, res)=>{
         const cursor = foodsCollection.find()
         const result = await cursor.toArray()
+        res.send(result)
+      })
+
+
+      app.get("/singleFood/:id",async (req, res)=>{
+        const id = req.params.id
+        console.log(id);
+        // const qurey = { _id: new ObjectId(id) };
+        const result =await foodsCollection.findOne({_id: new ObjectId(id)})
+        // const result = await cursor.toArray()
         console.log(result);
         res.send(result)
+
       })
   
 
