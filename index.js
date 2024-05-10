@@ -50,6 +50,13 @@ async function run() {
         res.send(result)
 
       })
+
+
+      app.get("/gallery", async (req, res)=>{
+        const cursor = galleryCollection.find()
+        const result = await cursor.toArray()
+        res.send(result)
+      })
   
       app.post("/gallery",async (req, res)=>{
         const newGallery = req.body
