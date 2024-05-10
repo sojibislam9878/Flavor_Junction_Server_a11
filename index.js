@@ -31,7 +31,7 @@ async function run() {
 
     const galleryCollection = client
       .db("RestaurantDB")
-      .collection("allFoods");
+      .collection("allGallery");
 
       app.get("/allFoods",async (req, res)=>{
         const cursor = foodsCollection.find()
@@ -51,6 +51,25 @@ async function run() {
 
       })
 
+
+      app.get("/myaddedfoods/:email", async (req, res)=>{
+        console.log(req.params.email);
+        const result = await foodsCollection
+        .find({ email: req.params.email })
+        .toArray();
+        console.log(result);
+        res.send(result)
+      })
+
+
+      app.post("/allFoods" , async (req, res)=>{
+        const newFood = req.body
+        const result = await foodsCollection.insertOne(newFood)
+        res.send(result)
+      })
+
+
+        // gallerycolleciton functions
 
       app.get("/gallery", async (req, res)=>{
         const cursor = galleryCollection.find()
