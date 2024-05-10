@@ -29,6 +29,10 @@ async function run() {
       .db("RestaurantDB")
       .collection("allFoods");
 
+    const galleryCollection = client
+      .db("RestaurantDB")
+      .collection("allFoods");
+
       app.get("/allFoods",async (req, res)=>{
         const cursor = foodsCollection.find()
         const result = await cursor.toArray()
@@ -47,7 +51,12 @@ async function run() {
 
       })
   
-
+      app.post("/gallery",async (req, res)=>{
+        const newGallery = req.body
+        console.log(newGallery);
+        const result = await galleryCollection.insertOne(newGallery);
+      res.send(result);
+      })
 
     await client.connect();
     // Send a ping to confirm a successful connection
