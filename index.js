@@ -92,6 +92,13 @@ async function run() {
         res.send(result);
       });
 
+      app.delete("/delete/:id", async (req, res) => {
+        const id = req.params.id;
+        const qurey = { _id: new ObjectId(id) };
+        const result = await foodsCollection.deleteOne(qurey);
+        res.send(result);
+      });
+
 
         // gallerycolleciton functions
 
