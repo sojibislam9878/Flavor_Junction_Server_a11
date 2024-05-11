@@ -100,6 +100,52 @@ async function run() {
       });
 
 
+      // for pagination
+      app.get("/allFoodsForPagination",async (req, res)=>{
+        const size = parseInt(req.query.size)
+        const page =parseInt(req.query.page) - 1
+        const filter = req.query.filter
+        const sort =req.query.sort
+        const search = req.query.search
+        console.log(search);
+
+        let query = {
+          food_name :{$regex : search, $options: "i"}
+        }
+        if (filter) {
+          // query = {...query, food_category : filter}
+          query.food_category = filter
+        }
+
+        let option = {}
+        if (sort) {
+          option = {sort : {price: sort==="low" ? 1 : -1} }
+        }
+        const result =await foodsCollection.find(query , option).skip(size*page).limit(size).toArray()
+        res.send(result)
+      })
+
+
+
+      // data count 
+      app.get("/allFoodsCont",async (req, res)=>{
+        const filter = req.query.filter
+        const search = req.query.search
+        console.log(filter);
+        
+
+        let query = {
+          food_name :{$regex : search, $options: "i"}
+        }
+        if (filter) {
+          // query = {...query, food_category : filter}
+          query.food_category = filter
+        }
+        const count =await foodsCollection.countDocuments(query)
+        res.send({count})
+      })
+
+
         // gallerycolleciton functions
 
       app.get("/gallery", async (req, res)=>{
