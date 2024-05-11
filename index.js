@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require("cookie-parser")
+const jwt = require("jsonwebtoken")
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 const app = express()
@@ -7,7 +9,29 @@ const port = process.env.PORT || 3000
 
 // midldle
 app.use(express.json())
-app.use(cors())
+app.use(cookieParser())
+app.use(cors({
+  origin:[
+    "http://localhost:5173"
+  ], 
+  credentials:true
+}))
+
+
+const verify = (req, res, next)=>{
+  const token = req?.cookies?.token
+  if (!token) {
+    return res.status(401).send({message: "unauthorized access"})
+  }
+  jwt.verify(token, process.env.ACC_TOKEN_SECRET, (err,decoded)=>{
+    if (err) {
+      return res.status(401).send({message: "unauthorized access"})
+    }
+    req.user = decoded;
+    next()
+
+  })
+}
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.lb51cqq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
 
@@ -52,12 +76,20 @@ async function run() {
       })
 
 
-      app.get("/myaddedfoods/:email", async (req, res)=>{
-        console.log(req.params.email);
+      app.get("/myaddedfoods/:email", verify,  async (req, res)=>{
+        console.log("owner info", req.user.email);
+        console.log("requit info", req.params.email);
+        // if (req.user.email !== req.params.email) {
+        //   return console.log("cor tumi");
+          
+        // }
+        // if (req.user.email !== req.params.email) {
+        //   return res.status(403).send({message: "forbidden access"})
+        // }
+
         const result = await foodsCollection
         .find({ email: req.params.email })
         .toArray();
-        console.log(result);
         res.send(result)
       })
 
@@ -159,6 +191,27 @@ async function run() {
         console.log(newGallery);
         const result = await galleryCollection.insertOne(newGallery);
       res.send(result);
+      })
+
+      // jwt related api 
+      app.post("/jwt", async(req, res) =>{
+        const user =req.body
+        const token = jwt.sign(user, process.env.ACC_TOKEN_SECRET, {expiresIn: '1h'})
+        res
+        .cookie("token" , token, {
+          httpOnly: true, 
+          secure:true,
+          sameSite:"none"
+        })
+        .send({success: true})
+
+      })
+
+
+      app.post("/logout", async (req, res)=>{
+        const user =req.body
+        console.log(user);
+        res.clearCookie("token", {maxAge:0}).send({success:true})
       })
 
     await client.connect();
