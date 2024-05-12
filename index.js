@@ -57,6 +57,10 @@ async function run() {
       .db("RestaurantDB")
       .collection("allGallery");
 
+    const purchaseFoodsCollection = client
+      .db("RestaurantDB")
+      .collection("purchaseFoods");
+
       app.get("/allFoods",async (req, res)=>{
         const cursor = foodsCollection.find()
         const result = await cursor.toArray()
@@ -83,9 +87,9 @@ async function run() {
         //   return console.log("cor tumi");
           
         // }
-        // if (req.user.email !== req.params.email) {
-        //   return res.status(403).send({message: "forbidden access"})
-        // }
+        if (req.user.email !== req.params.email) {
+          return res.status(403).send({message: "forbidden access"})
+        }
 
         const result = await foodsCollection
         .find({ email: req.params.email })
@@ -178,8 +182,7 @@ async function run() {
       })
 
 
-        // gallerycolleciton functions
-
+      // gallerycolleciton functions
       app.get("/gallery", async (req, res)=>{
         const cursor = galleryCollection.find()
         const result = await cursor.toArray()
@@ -191,6 +194,17 @@ async function run() {
         console.log(newGallery);
         const result = await galleryCollection.insertOne(newGallery);
       res.send(result);
+      })
+
+
+
+      // purchase foods related api 
+
+      app.post("/purchaseFoods", async (req, res)=>{
+        const purchaseFood = req.body
+        console.log(purchaseFood);
+        const result = await purchaseFoodsCollection.insertOne(purchaseFood)
+        res.send(result)
       })
 
       // jwt related api 
@@ -213,6 +227,8 @@ async function run() {
         console.log(user);
         res.clearCookie("token", {maxAge:0}).send({success:true})
       })
+
+
 
     await client.connect();
     // Send a ping to confirm a successful connection
