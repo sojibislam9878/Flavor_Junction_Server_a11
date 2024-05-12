@@ -207,6 +207,14 @@ async function run() {
         res.send(result)
       })
 
+
+      app.get("/purchaseFoods/:email", async (req, res)=>{
+        // const email= req.params.email
+        const result =await purchaseFoodsCollection.find({buyerEmail: req.params.email}).toArray()
+        // console.log(result);
+        res.send(result)
+      })
+
       // jwt related api 
       app.post("/jwt", async(req, res) =>{
         const user =req.body
