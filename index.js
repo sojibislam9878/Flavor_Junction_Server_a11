@@ -12,7 +12,8 @@ app.use(express.json())
 app.use(cookieParser())
 app.use(cors({
   origin:[
-    "http://localhost:5173"
+    "http://localhost:5173",
+    "https://sojibislam9878assignment11.web.app"
   ], 
   credentials:true
 }))
@@ -61,7 +62,7 @@ async function run() {
       .db("RestaurantDB")
       .collection("purchaseFoods");
 
-      app.get("/allFoods",async (req, res)=>{
+      app.get("/allfoods",async (req, res)=>{
         const cursor = foodsCollection.find()
         const result = await cursor.toArray()
         res.send(result)
@@ -215,6 +216,13 @@ async function run() {
         res.send(result)
       })
 
+      app.delete("/orderdelete/:id", async (req, res) => {
+        const id = req.params.id;
+        const qurey = { _id: new ObjectId(id) };
+        const result = await purchaseFoodsCollection.deleteOne(qurey);
+        res.send(result);
+      });
+
       // jwt related api 
       app.post("/jwt", async(req, res) =>{
         const user =req.body
@@ -240,8 +248,8 @@ async function run() {
 
     await client.connect();
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    // await client.db("admin").command({ ping: 1 });
+    // console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
