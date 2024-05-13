@@ -62,6 +62,10 @@ async function run() {
       .db("RestaurantDB")
       .collection("purchaseFoods");
 
+    const usersCollection = client
+      .db("RestaurantDB")
+      .collection("allUsers");
+
       app.get("/allfoods",async (req, res)=>{
         const cursor = foodsCollection.find()
         const result = await cursor.toArray()
@@ -222,6 +226,14 @@ async function run() {
         const result = await purchaseFoodsCollection.deleteOne(qurey);
         res.send(result);
       });
+
+
+      app.post("/users", async (req, res)=>{
+        const newUser = req.body
+        console.log(newUser);
+        const result = await usersCollection.insertOne(newUser)
+        res.send(result)
+      })
 
       // jwt related api 
       app.post("/jwt", async(req, res) =>{
