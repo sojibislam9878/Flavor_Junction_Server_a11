@@ -213,8 +213,11 @@ async function run() {
       })
 
 
-      app.get("/purchaseFoods/:email", async (req, res)=>{
+      app.get("/purchaseFoods/:email", verify, async (req, res)=>{
         // const email= req.params.email
+        if (req.user.email !== req.params.email) {
+          return res.status(403).send({message: "forbidden access"})
+        }
         const result =await purchaseFoodsCollection.find({buyerEmail: req.params.email}).toArray()
         // console.log(result);
         res.send(result)
@@ -240,10 +243,10 @@ async function run() {
         const user =req.body
         const token = jwt.sign(user, process.env.ACC_TOKEN_SECRET, {expiresIn: '1h'})
         res
-        .cookie("token" , token, {
-          httpOnly: true, 
-          secure:true,
-          sameSite:"none"
+        .cookie("token", token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite:  process.env.NODE_ENV === 'production' ? 'none' : 'strict',
         })
         .send({success: true})
 
