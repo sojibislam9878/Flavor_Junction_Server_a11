@@ -206,7 +206,11 @@ async function run() {
       // purchase foods related api 
 
       app.post("/purchaseFoods", async (req, res)=>{
+        const {id} = req.query
         const purchaseFood = req.body
+        foodsCollection.updateOne({_id: new ObjectId(id)},{$inc : {purchase_count : 1}})
+        console.log("hitted");
+        console.log(id);
         console.log(purchaseFood);
         const result = await purchaseFoodsCollection.insertOne(purchaseFood)
         res.send(result)
