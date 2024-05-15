@@ -150,6 +150,7 @@ async function run() {
       const result = await foodsCollection.aggregate(processes).toArray();
       res.send(result);
     });
+    
 
     // data count
     app.get("/allFoodsCont", async (req, res) => {
@@ -179,23 +180,30 @@ async function run() {
       res.send(result);
     });
 
+
     // purchase foods related api
 
     app.post("/purchaseFoods", async (req, res) => {
       try {
         const { id, quantitys } = req.query;
-        
+
         const numberQuantity = parseInt(quantitys);
         const purchaseFood = req.body;
-        
-        await foodsCollection.updateOne({ _id: new ObjectId(id) }, { $inc: { purchase_count: 1 } });
+
+        await foodsCollection.updateOne(
+          { _id: new ObjectId(id) },
+          { $inc: { purchase_count: 1 } }
+        );
 
         const food = await foodsCollection.findOne({ _id: new ObjectId(id) });
         const currentQuantity = parseInt(food.quantity);
-        await foodsCollection.updateOne({ _id: new ObjectId(id) }, { $set: { quantity: currentQuantity - numberQuantity } });
+        await foodsCollection.updateOne(
+          { _id: new ObjectId(id) },
+          { $set: { quantity: currentQuantity - numberQuantity } }
+        );
 
         const result = await purchaseFoodsCollection.insertOne(purchaseFood);
-        
+
         res.send(result);
       } catch (err) {
         console.error(err);
@@ -213,6 +221,7 @@ async function run() {
       res.send(result);
     });
 
+
     app.delete("/orderdelete/:id", async (req, res) => {
       const id = req.params.id;
       const qurey = { _id: new ObjectId(id) };
@@ -225,6 +234,7 @@ async function run() {
       const result = await usersCollection.insertOne(newUser);
       res.send(result);
     });
+
 
     // jwt related api
     app.post("/jwt", async (req, res) => {
