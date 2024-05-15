@@ -69,21 +69,11 @@ async function run() {
 
     app.get("/singleFood/:id", async (req, res) => {
       const id = req.params.id;
-      console.log(id);
-      // const qurey = { _id: new ObjectId(id) };
       const result = await foodsCollection.findOne({ _id: new ObjectId(id) });
-      // const result = await cursor.toArray()
-      console.log(result);
       res.send(result);
     });
 
     app.get("/myaddedfoods/:email", verify, async (req, res) => {
-      console.log("owner info", req.user.email);
-      console.log("requit info", req.params.email);
-      // if (req.user.email !== req.params.email) {
-      //   return console.log("cor tumi");
-
-      // }
       if (req.user.email !== req.params.email) {
         return res.status(403).send({ message: "forbidden access" });
       }
@@ -165,13 +155,11 @@ async function run() {
     app.get("/allFoodsCont", async (req, res) => {
       const filter = req.query.filter;
       const search = req.query.search;
-      console.log(filter);
 
       let query = {
         food_name: { $regex: search, $options: "i" },
       };
       if (filter) {
-        // query = {...query, food_category : filter}
         query.food_category = filter;
       }
       const count = await foodsCollection.countDocuments(query);
@@ -187,7 +175,6 @@ async function run() {
 
     app.post("/gallery", async (req, res) => {
       const newGallery = req.body;
-      console.log(newGallery);
       const result = await galleryCollection.insertOne(newGallery);
       res.send(result);
     });
@@ -197,7 +184,6 @@ async function run() {
     app.post("/purchaseFoods", async (req, res) => {
       try {
         const { id, quantitys } = req.query;
-        console.log(id, quantitys);
         
         const numberQuantity = parseInt(quantitys);
         const purchaseFood = req.body;
@@ -224,7 +210,6 @@ async function run() {
       const result = await purchaseFoodsCollection
         .find({ buyerEmail: req.params.email })
         .toArray();
-      // console.log(result);
       res.send(result);
     });
 
@@ -237,7 +222,6 @@ async function run() {
 
     app.post("/users", async (req, res) => {
       const newUser = req.body;
-      console.log(newUser);
       const result = await usersCollection.insertOne(newUser);
       res.send(result);
     });
@@ -259,7 +243,6 @@ async function run() {
 
     app.post("/logout", async (req, res) => {
       const user = req.body;
-      console.log(user);
       res.clearCookie("token", { maxAge: 0 }).send({ success: true });
     });
 
